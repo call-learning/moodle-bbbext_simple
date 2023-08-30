@@ -18,7 +18,7 @@ namespace bbbext_simple\bigbluebuttonbn;
 /**
  * A single action class to mutate the action URL.
  *
- * @package   bbbext_simple
+ * @package   mod_bigbluebuttonbn
  * @copyright 2023 onwards, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David (laurent@call-learning.fr)
@@ -36,8 +36,8 @@ class action_url_addons extends \mod_bigbluebuttonbn\local\extension\action_url_
      */
     public function execute(string $action = '', array $data = [], array $metadata = []): array {
         return [
-            'data' => $action == 'create' ? [] : ['a', 'b'],
-            'metadata' => in_array('Test', $metadata) ? ['c', 'd'] : []
+            'data' => $action == 'create' ? [] : ['a' => 5, 'b' => 3],
+            'metadata' => in_array('Test', $metadata) ? ['c' => 4, 'd' => 5] : []
         ];
     }
 }

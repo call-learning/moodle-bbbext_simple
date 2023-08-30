@@ -24,7 +24,8 @@
 class backup_bbbext_simple_subplugin extends backup_subplugin {
 
     /**
-     * Returns the subplugin information to attach to submission element.
+     * Returns the subplugin information to attach the BigBlueButton instance.
+     *
      * @return backup_subplugin_element
      */
     protected function define_bigbluebuttonbn_subplugin_structure() {
@@ -32,17 +33,21 @@ class backup_bbbext_simple_subplugin extends backup_subplugin {
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
-        $subpluginelement = new backup_nested_element('bbbext_simple',
-                                                      null,
-                                                      array('newfield', 'completionextraisehandtwice'));
+        $subpluginelement = new backup_nested_element(
+            'bbbext_simple',
+            null,
+            ['newfield', 'completionextraisehandtwice']
+        );
 
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);
         $subpluginwrapper->add_child($subpluginelement);
 
         // Set source to populate the data.
-        $subpluginelement->set_source_table('bbbext_simple',
-                                            array('bigbluebuttonbnid' => backup::VAR_PARENTID));
+        $subpluginelement->set_source_table(
+            'bbbext_simple',
+            ['bigbluebuttonbnid' => backup::VAR_PARENTID]
+        );
 
         return $subplugin;
     }

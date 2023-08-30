@@ -64,10 +64,8 @@ class custom_completion_addons extends \mod_bigbluebuttonbn\local\extension\cust
      * @throws \coding_exception
      */
     public function get_custom_rule_descriptions(): array {
-        $completionextraisehandtwice = $this->cm->customdata['customcompletionrules']['completionextraisehandtwice'] ?? 1;
         return [
-            'completionextraisehandtwice' => get_string('completionextraisehandtwice_desc', 'bbbext_simple',
-                $completionextraisehandtwice),
+            'completionextraisehandtwice' => get_string('completionextraisehandtwice_desc', 'bbbext_simple'),
         ];
     }
 

@@ -19,7 +19,7 @@ use completion_info;
 use stdClass;
 
 /**
- * Completion raise hand twice computation class
+ * A class for the main mod form extension
  *
  * @package   bbbext_simple
  * @copyright 2023 onwards, Blindside Networks Inc
@@ -28,39 +28,46 @@ use stdClass;
  */
 class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addons {
     /**
-     * Preprocess process data for completion
+     * Allows modules to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
      *
-     * @param array $defaultvalues
-     * @return void
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data passed by reference
      */
-    public function data_preprocessing(array &$defaultvalues): void {
-        if (!empty($this->bigbluebuttonbndata)) {
+    public function data_postprocessing(\stdClass &$data): void {
+        // Nothing for now.
+    }
+
+    /**
+     * Allow module to modify  the data at the pre-processing stage.
+     *
+     * This method is also called in the bulk activity completion form.
+     *
+     * @param array|null $defaultvalues
+     */
+    public function data_preprocessing(?array &$defaultvalues): void {
+        // This is where we can add the data from the flexurl table to the data provided.
+        if (!empty($defaultvalues['id'])) {
             global $DB;
-            $record = $DB->get_record('bbbext_simple', [
-                'bigbluebuttonbnid' => $this->bigbluebuttonbndata->id,
+            $flexurlrecord = $DB->get_record('bbbext_simple', [
+                'bigbluebuttonbnid' => $defaultvalues['id'],
             ]);
-            if (!empty($record)) {
-                unset($record->id);
-                unset($record->bigbluebuttonbnid);
-                $defaultvalues = array_merge($defaultvalues, (array) $record);
+            if ($flexurlrecord) {
+                $defaultvalues['newfield'] = $flexurlrecord->newfield;
             }
         }
     }
 
     /**
-     * Is the form element enabled
+     * Can be overridden to add custom completion rules if the module wishes
+     * them. If overriding this, you should also override completion_rule_enabled.
+     * <p>
+     * Just add elements to the form as needed and return the list of IDs. The
+     * system will call disabledIf and handle other behaviour for each returned
+     * ID.
      *
-     * @param array $data current data allowing to check if completion enabled or not.
-     * @return bool
-     */
-    public function completion_rule_enabled(array $data): bool {
-        return !empty($data['completionextraisehandtwice']);
-    }
-
-    /**
-     * Add additional form elements for this completion group (module editing form)
-     *
-     * @return array
+     * @return array Array of string IDs of added items, empty array if none
      */
     public function add_completion_rules(): array {
         $this->mform->addElement('advcheckbox', 'completionextraisehandtwice',
@@ -70,17 +77,51 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
         $this->mform->addHelpButton('completionextraisehandtwice', 'completionextraisehandtwice',
             'bbbext_simple');
         $this->mform->disabledIf('completionextraisehandtwice', 'completion', 'neq', COMPLETION_AGGREGATION_ANY);
-        return ['completionextraisehandtwice'];
+        return ['completionextraisehandtwice' . $this->suffix];
     }
 
     /**
-     * Allows modules to modify the data returned by form get_data().
-     * This method is also called in the bulk activity completion form.
+     * Called during validation. Override to indicate, based on the data, whether
+     * a custom completion rule is enabled (selected).
      *
-     * Only available on moodleform_mod.
-     *
-     * @param stdClass $data passed by reference
+     * @param array $data Input data (not yet validated)
+     * @return bool True if one or more rules is enabled, false if none are;
+     *   default returns false
      */
-    public function data_postprocessing(stdClass &$data): void {
+    public function completion_rule_enabled(array $data): bool {
+        return !empty($data['completionextraisehandtwice' . $this->suffix]);
+    }
+
+    /**
+     * Form adjustments after setting data
+     *
+     * @return void
+     */
+    public function definition_after_data() {
+        // Nothing for now.
+    }
+
+    /**
+     * Add new form field definition
+     */
+    public function add_fields(): void {
+        $this->mform->addElement('header', 'simple', get_string('pluginname', 'bbbext_simple'));
+        $this->mform->addElement('text', 'newfield', get_string('newfield', 'bbbext_simple'));
+        $this->mform->setType('newfield', PARAM_TEXT);
+    }
+
+    /**
+     * Validate form and returns an array of errors indexed by field name
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation(array $data, array $files): array {
+        $errors = [];
+        if (empty($data['newfield' . $this->suffix])) {
+            $errors['newfield'] = get_string('newfielderror', 'bbbext_simple');
+        }
+        return $errors;
     }
 }

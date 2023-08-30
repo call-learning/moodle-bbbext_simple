@@ -24,12 +24,13 @@
  */
 class restore_bbbext_simple_subplugin extends restore_subplugin {
     /**
-     * Returns the paths to be handled by the subplugin at workshop level
+     * Returns the paths to be handled by the subplugin.
+     *
      * @return array
      */
     protected function define_bigbluebuttonbn_subplugin_structure() {
 
-        $paths = array();
+        $paths = [];
 
         $elename = $this->get_namefor('bigbluebuttonbn');
         // We used get_recommended_name() so this works.
@@ -41,13 +42,14 @@ class restore_bbbext_simple_subplugin extends restore_subplugin {
     }
 
     /**
-     * Processes one feedback_comments element.
+     * Processes one subplugin instance additional parameter.
+     *
      * @param mixed $data
      */
     public function process_bbbext_simple_bigbluebuttonbn($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $data->bigbluebuttonbnid = $this->get_new_parentid('bigbluebuttonbn');
         $DB->insert_record('bbbext_simple', $data);
     }
