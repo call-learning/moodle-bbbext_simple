@@ -36,7 +36,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @param stdClass $data passed by reference
      */
     public function data_postprocessing(\stdClass &$data): void {
-        // Nothing for now.
+        // Nothing to do for now.
     }
 
     /**
@@ -55,6 +55,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
             ]);
             if ($flexurlrecord) {
                 $defaultvalues['newfield'] = $flexurlrecord->newfield;
+                $defaultvalues['completionextraisehandtwice' . $this->suffix] = $flexurlrecord->completionextraisehandtwice;
             }
         }
     }
@@ -70,14 +71,15 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      * @return array Array of string IDs of added items, empty array if none
      */
     public function add_completion_rules(): array {
-        $this->mform->addElement('advcheckbox', 'completionextraisehandtwice',
+        $fieldname = 'completionextraisehandtwice' . $this->suffix;
+        $this->mform->addElement('advcheckbox', $fieldname,
             get_string('completionextraisehandtwice', 'bbbext_simple'),
             get_string('completionextraisehandtwice_desc', 'bbbext_simple'));
 
-        $this->mform->addHelpButton('completionextraisehandtwice', 'completionextraisehandtwice',
+        $this->mform->addHelpButton($fieldname, 'completionextraisehandtwice',
             'bbbext_simple');
-        $this->mform->disabledIf('completionextraisehandtwice', 'completion', 'neq', COMPLETION_AGGREGATION_ANY);
-        return ['completionextraisehandtwice' . $this->suffix];
+        $this->mform->disabledIf($fieldname, 'completion', 'neq', COMPLETION_AGGREGATION_ANY);
+        return [$fieldname];
     }
 
     /**
@@ -119,7 +121,7 @@ class mod_form_addons extends \mod_bigbluebuttonbn\local\extension\mod_form_addo
      */
     public function validation(array $data, array $files): array {
         $errors = [];
-        if (empty($data['newfield' . $this->suffix])) {
+        if (empty($data['newfield'])) {
             $errors['newfield'] = get_string('newfielderror', 'bbbext_simple');
         }
         return $errors;
